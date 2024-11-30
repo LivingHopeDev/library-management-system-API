@@ -70,20 +70,20 @@ const errorHandler = (
   err: HttpError | any,
   _req: Request,
   res: Response,
-  _next: NextFunction,
+  _next: NextFunction
 ) => {
-  log.error(err)
+  log.error(err);
   const success = err.success !== undefined ? err.success : false;
-  const status_code = err.status_code || 500;
+  const status = err.status_code || 500;
   const message = err.message || "An unexpected error occurred";
   const cleanedMessage = message.replace(/"/g, "");
 
   if (config.NODE_ENV === "development") {
     log.error("Error", err);
   }
-  res.status(status_code).json({
+  res.status(status).json({
     success,
-    status_code,
+    status,
     message: cleanedMessage,
   });
 };
