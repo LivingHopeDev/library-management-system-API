@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { validateData } from "../middlewares";
 import { loginSchema, SignUpSchema } from "../schema/user.schema";
-import { login, signUp } from "../controllers/auth.controller";
+import { login, signUp } from "../controllers";
 const authRouter: Router = Router();
 
 authRouter.post("/register", validateData(SignUpSchema), signUp);

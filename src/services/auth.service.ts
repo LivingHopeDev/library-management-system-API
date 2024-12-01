@@ -2,8 +2,18 @@ import { prismaClient } from "..";
 import { Conflict, ResourceNotFound } from "../middlewares";
 import { IUserLogin, IUserSignUp } from "../types";
 import { User } from "@prisma/client";
-import { comparePassword, generateAccessToken, hashPassword } from "../utils";
+import {
+  comparePassword,
+  generateAccessToken,
+  hashPassword,
+  generateNumericOTP,
+} from "../utils";
+import { addEmailToQueue } from "../utils/queue";
+import { OtpService, EmailService } from ".";
+import config from "../config";
 export class AuthService {
+  private otpService = new OtpService();
+  private emailService = new EmailService();
   public async signUp(payload: IUserSignUp): Promise<{
     message: string;
     user: Partial<User>;
@@ -22,12 +32,22 @@ export class AuthService {
         password: hashedPassword,
       },
     });
+    const otp = await this.otpService.createOtp(newUser.id);
 
+    const { emailBody, emailText } =
+      await this.emailService.verifyEmailTemplate(username, otp!.token);
     const userResponse = {
       id: newUser.id,
       username: newUser.username,
       email: newUser.email,
     };
+    await addEmailToQueue({
+      from: config.GOOGLE_SENDER_MAIL,
+      to: email,
+      subject: "Email VERIFICATION",
+      text: emailText,
+      html: emailBody,
+    });
     return {
       user: userResponse,
       message:

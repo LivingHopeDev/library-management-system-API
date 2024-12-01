@@ -24,20 +24,22 @@ model User {
   email       String      @unique
   password    String
   accountType accountType @default(user)
-
-  createdAt DateTime @default(now())
-  updaredAt DateTime @updatedAt
-  otp       Otp[]
-  profile   Profile?
+  is_verified Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updaredAt   DateTime    @updatedAt
+  otp         Otp[]
+  profile     Profile?
 
   @@map("users")
 }
 
 model Otp {
-  id     String @id @unique @default(uuid())
+  id     String   @id @unique @default(uuid())
   token  String
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  expiry DateTime
+
+  user User @relation(fields: [userId], references: [id],onDelete:Cascade)
 
   @@map("otps")
 }
@@ -49,7 +51,7 @@ model Profile {
   phone       String
   countryCode String
   country     String
-  state     String
+  state       String
   userId      String @unique
   user        User   @relation(fields: [userId], references: [id])
 

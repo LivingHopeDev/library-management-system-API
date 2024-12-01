@@ -4,6 +4,9 @@ import cors from "cors";
 import rootRouter from "./routes";
 import { PrismaClient } from "@prisma/client";
 import { errorHandler, routeNotFound } from "./middlewares";
+import log from "./utils/logger";
+import ServerAdapter from "./config/bullBoard";
+import { Request, Response } from "express";
 const app = express();
 const port = config.PORT;
 app.use(express.json());
@@ -16,6 +19,13 @@ app.get("/api", (req, res) => {
       "Welcome to library management system: I will be responding to your requests",
   });
 });
+app.get("/api/queues/:passkey", (req: Request, res: Response) => {
+  if (req.params.passkey !== process.env.BULL_PASSKEY) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+  ServerAdapter.getRouter()(req, res);
+});
 app.use("/api", rootRouter);
 
 export const prismaClient = new PrismaClient({
@@ -25,5 +35,5 @@ export const prismaClient = new PrismaClient({
 app.use(errorHandler);
 app.use(routeNotFound);
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  log.info(`Server is listening on port ${port}`);
 });
