@@ -1,7 +1,12 @@
 import { prismaClient } from "..";
-import { Conflict, ResourceNotFound } from "../middlewares";
+import {
+  Conflict,
+  ResourceNotFound,
+  Expired,
+  BadRequest,
+} from "../middlewares";
 import { IUserLogin, IUserSignUp } from "../types";
-import { User } from "@prisma/client";
+import { accountType, User } from "@prisma/client";
 import {
   comparePassword,
   generateAccessToken,
@@ -44,7 +49,7 @@ export class AuthService {
     await addEmailToQueue({
       from: config.GOOGLE_SENDER_MAIL,
       to: email,
-      subject: "Email VERIFICATION",
+      subject: "Email Verification",
       text: emailText,
       html: emailBody,
     });
@@ -73,6 +78,7 @@ export class AuthService {
     const user = {
       username: userExist.username,
       email: userExist.email,
+      accountType: userExist.accountType,
     };
     return {
       message: "Login Successfully",
@@ -80,4 +86,77 @@ export class AuthService {
       token: accessToken,
     };
   }
+
+  public async forgotPassword(email: string): Promise<{ message: string }> {
+    const user = await prismaClient.user.findFirst({
+      where: { email: email },
+    });
+    if (!user) {
+      throw new ResourceNotFound("User not found");
+    }
+
+    const token = generateNumericOTP(6);
+    const otp_expires = new Date(Date.now() + 15 * 60 * 1000);
+
+    const otp = await prismaClient.otp.create({
+      data: {
+        token: token,
+        expiry: otp_expires,
+        userId: user.id,
+      },
+    });
+    const { emailBody, emailText } =
+      await this.emailService.resetPasswordTemplate(user.username, otp!.token);
+
+    await addEmailToQueue({
+      from: `${config.GOOGLE_SENDER_MAIL}`,
+      to: email,
+      subject: "Password Reset",
+      text: emailText,
+      html: emailBody,
+    });
+    return {
+      message: "OTP sent successfully",
+    };
+  }
+
+  resetPassword = async (
+    token: string,
+    new_password: string,
+    confirm_password: string
+  ): Promise<{ message: string }> => {
+    if (new_password !== confirm_password) {
+      throw new BadRequest("Password doesn't match");
+    }
+    const otp = await prismaClient.otp.findFirst({
+      where: { token },
+      include: { user: true },
+    });
+    if (!otp) {
+      throw new ResourceNotFound("Invalid OTP");
+    }
+
+    if (otp.expiry < new Date()) {
+      // Delete the expired OTP
+      await prismaClient.otp.delete({
+        where: { id: otp.id },
+      });
+      throw new Expired("OTP has expired");
+    }
+
+    const hashedPassword = await hashPassword(new_password);
+    await prismaClient.$transaction([
+      prismaClient.user.update({
+        where: { id: otp.userId },
+        data: { password: hashedPassword },
+      }),
+      prismaClient.otp.delete({
+        where: { id: otp.id },
+      }),
+    ]);
+
+    return {
+      message: "Password reset successfully.",
+    };
+  };
 }

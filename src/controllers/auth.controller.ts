@@ -12,3 +12,27 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   const { message, user, token } = await authService.login(req.body);
   res.status(200).json({ status: 200, message, data: { token, user } });
 });
+
+export const forgetPassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    const { message } = await authService.forgotPassword(email);
+
+    return res.status(200).json({ status_code: 200, message });
+  }
+);
+
+export const resetPassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { token, new_password, confirm_password } = req.body;
+
+    const { message } = await authService.resetPassword(
+      token,
+      new_password,
+      confirm_password
+    );
+
+    return res.status(200).json({ status_code: 200, message });
+  }
+);

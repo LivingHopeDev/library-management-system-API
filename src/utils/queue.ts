@@ -48,10 +48,10 @@ const addEmailToQueue = async (data: EmailJobData) => {
   try {
     await emailQueue.add("email-job", data, {
       jobId: `email-${data.to}-${Date.now()}`,
-      attempts: retries, // Retry 2 times
+      attempts: retries,
       backoff: {
         type: "fixed", // Fixed backoff strategy
-        delay, // Retry delay of 30 seconds
+        delay,
       },
     });
 
