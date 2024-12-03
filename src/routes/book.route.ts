@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { addBook, getBookById, getBooks } from "../controllers/book.controller";
+import {
+  addBook,
+  getBookById,
+  getBooks,
+  updateBook,
+} from "../controllers/book.controller";
 import { adminMiddleware, authMiddleware, validateData } from "../middlewares";
 import { BookSchema } from "../schema/book.schema";
 
@@ -20,7 +25,7 @@ bookRouter.patch(
   validateData(BookSchema),
   authMiddleware,
   adminMiddleware,
-  addBook
+  updateBook
 );
 
 bookRouter.delete("/:id", authMiddleware, adminMiddleware, addBook);

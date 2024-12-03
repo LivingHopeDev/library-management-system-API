@@ -42,4 +42,26 @@ export class BookService {
     }
     return { book };
   }
+
+  public async updateBook(
+    bookId: string,
+    payload: Partial<IBook>
+  ): Promise<{ message: string; book: IBook }> {
+    const existingBook = await prismaClient.book.findFirst({
+      where: { id: bookId },
+    });
+    if (!existingBook) {
+      throw new ResourceNotFound("Book not found or access denied");
+    }
+
+    const updatedBook = await prismaClient.book.update({
+      where: { id: bookId },
+      data: payload,
+    });
+
+    return {
+      message: "Book updated successfully",
+      book: updatedBook,
+    };
+  }
 }

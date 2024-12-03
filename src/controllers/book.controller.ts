@@ -19,3 +19,10 @@ export const getBookById = asyncHandler(async (req: Request, res: Response) => {
   const { book } = await bookService.getBookById(bookId);
   res.status(200).json({ data: book });
 });
+
+export const updateBook = asyncHandler(async (req: Request, res: Response) => {
+  const bookId = req.params.id;
+
+  const { message, book } = await bookService.updateBook(bookId, req.body);
+  res.status(200).json({ message, data: book });
+});
