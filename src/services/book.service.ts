@@ -15,16 +15,37 @@ export class BookService {
       book,
     };
   }
-  public async getBooks(): Promise<{ books: IBook[]; message?: string }> {
-    const books = await prismaClient.book.findMany();
+  public async getBooks(query: {
+    page?: number;
+    limit?: number;
+    genre?: string;
+    availability?: string;
+  }): Promise<{ books: IBook[]; total: number; message?: string }> {
+    const { page = 1, limit = 10, genre, availability } = query;
+
+    const filters: Record<string, any> = {};
+    if (genre) filters.genre = genre;
+    if (availability) filters.availability = availability === "true";
+
+    const [books, total] = await Promise.all([
+      prismaClient.book.findMany({
+        where: filters,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+      }),
+      prismaClient.book.count({ where: filters }),
+    ]);
 
     if (books.length === 0) {
       return {
-        message: "No book uploaded yet",
+        message: "No books match the specified criteria.",
         books: [],
+        total,
       };
     }
-    return { books };
+
+    return { books, total };
   }
 
   public async getBookById(bookId: string): Promise<{ book: Partial<IBook> }> {
@@ -58,10 +79,7 @@ export class BookService {
       book: updatedBook,
     };
   }
-  public async deleteBook(
-    bookId: string,
-    userId: string
-  ): Promise<{ message: string }> {
+  public async deleteBook(bookId: string): Promise<{ message: string }> {
     const existingBook = await prismaClient.book.findUnique({
       where: { id: bookId },
     });
