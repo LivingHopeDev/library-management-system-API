@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   addBook,
+  borrowBook,
   deleteBook,
   getBookById,
   getBooks,
@@ -31,4 +32,5 @@ bookRouter.patch(
 
 bookRouter.delete("/:id", authMiddleware, adminMiddleware, deleteBook);
 
+bookRouter.post("/borrow", authMiddleware, borrowBook);
 export { bookRouter };

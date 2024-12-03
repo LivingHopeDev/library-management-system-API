@@ -18,7 +18,7 @@ export const getBooks = asyncHandler(async (req: Request, res: Response) => {
   });
 
   res.status(200).json({
-    message: message || "Books retrieved successfully.",
+    message,
     data: {
       books,
       total,
@@ -46,4 +46,42 @@ export const deleteBook = asyncHandler(async (req: Request, res: Response) => {
 
   const { message } = await bookService.deleteBook(bookId);
   res.status(200).json({ message });
+});
+
+export const borrowBook = asyncHandler(async (req: Request, res: Response) => {
+  const { bookId } = req.body;
+  const userId = req.user.id;
+
+  const { message, borrowedBook } = await bookService.borrowBook(
+    bookId,
+    userId
+  );
+
+  const formattedResponse = {
+    status: 201,
+    message,
+    data: {
+      book: {
+        title: borrowedBook.book.title,
+        author: {
+          id: borrowedBook.book.id,
+          name: borrowedBook.book.author,
+        },
+        genre: borrowedBook.book.genre,
+        description: borrowedBook.book.description,
+        createdAt: borrowedBook.book.createdAt,
+        updatedAt: borrowedBook.book.updatedAt,
+        availability: borrowedBook.book.availability,
+        copies: borrowedBook.book.copies,
+      },
+      dateBorrow: borrowedBook.borrowedAt,
+      borrowedBy: {
+        id: borrowedBook.user.id,
+        name: borrowedBook.user.username,
+        email: borrowedBook.user.email,
+      },
+    },
+  };
+
+  res.status(201).json(formattedResponse);
 });

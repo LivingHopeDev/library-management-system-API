@@ -1,6 +1,8 @@
-import { ResourceNotFound, ServerError } from "../middlewares";
+import { Conflict, ResourceNotFound, ServerError } from "../middlewares";
 import { prismaClient } from "..";
 import { IBook } from "../types";
+import { BorrowedBook } from "@prisma/client";
+import { Book, User } from "@prisma/client";
 export class BookService {
   public async addBook(
     payload: IBook
@@ -45,7 +47,7 @@ export class BookService {
       };
     }
 
-    return { books, total };
+    return { message: "Books retrieved successfully.", books, total };
   }
 
   public async getBookById(bookId: string): Promise<{ book: Partial<IBook> }> {
@@ -92,5 +94,54 @@ export class BookService {
     });
 
     return { message: "Book deleted successfully" };
+  }
+
+  public async borrowBook(
+    bookId: string,
+    userId: string
+  ): Promise<{
+    message: string;
+    borrowedBook: {
+      book: Partial<Book>;
+      user: Partial<User>;
+      borrowedAt: Date;
+    };
+  }> {
+    const result = await prismaClient.$transaction(async (tx) => {
+      const book = await tx.book.findUnique({ where: { id: bookId } });
+
+      if (!book || book.copies <= 0) {
+        throw new Conflict("No copies available for this book.");
+      }
+
+      const updatedBook = await tx.book.update({
+        where: { id: bookId },
+        data: {
+          copies: book.copies - 1,
+          availability: book.copies - 1 > 0,
+        },
+      });
+
+      const borrowedBook = await tx.borrowedBook.create({
+        data: {
+          borrowedBy: userId,
+          bookId,
+          borrowedAt: new Date(),
+        },
+      });
+
+      const user = await tx.user.findUnique({ where: { id: userId } });
+
+      return {
+        book: updatedBook,
+        user,
+        borrowedAt: borrowedBook.borrowedAt,
+      };
+    });
+
+    return {
+      message: "Book borrowed successfully",
+      borrowedBook: result,
+    };
   }
 }

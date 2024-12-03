@@ -30,6 +30,7 @@ model User {
   otp         Otp[]
   profile     Profile?
   session     Session?
+  borrowedBook  BorrowedBook[]
 
   @@map("users")
 }
@@ -81,11 +82,27 @@ model Book {
   id           String   @id @unique @default(uuid())
   title        String
   genre        String
-  availability Boolean  @default(false)
+  availability Boolean  @default(true)
+  copies      Int      @default(1) 
   author       String
   description  String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  borrowedBook BorrowedBook[]
 
   @@map("books")
+}
+
+model BorrowedBook {
+  id          String   @default(uuid()) @id @unique
+  borrowedBy      String
+  user        User     @relation(fields: [borrowedBy], references: [id])
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id])
+  borrowedAt  DateTime @default(now())
+  returnedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("borrowed_books")
 }
