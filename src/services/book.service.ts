@@ -3,13 +3,11 @@ import { prismaClient } from "..";
 import { IBook } from "../types";
 export class BookService {
   public async addBook(
-    payload: IBook,
-    userId: string
+    payload: IBook
   ): Promise<{ message: string; book: IBook }> {
     const book = await prismaClient.book.create({
       data: {
         ...payload,
-        author: userId,
       },
     });
     return {
@@ -17,12 +15,8 @@ export class BookService {
       book,
     };
   }
-  public async getBooks(
-    userId?: string
-  ): Promise<{ books: IBook[]; message?: string }> {
-    const books = await prismaClient.book.findMany({
-      where: { author: userId },
-    });
+  public async getBooks(): Promise<{ books: IBook[]; message?: string }> {
+    const books = await prismaClient.book.findMany();
 
     if (books.length === 0) {
       return {
