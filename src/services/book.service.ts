@@ -32,4 +32,14 @@ export class BookService {
     }
     return { books };
   }
+
+  public async getBookById(bookId: string): Promise<{ book: Partial<IBook> }> {
+    const book = await prismaClient.book.findUnique({
+      where: { id: bookId },
+    });
+    if (!book) {
+      throw new ResourceNotFound("Book not found");
+    }
+    return { book };
+  }
 }

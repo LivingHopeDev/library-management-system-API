@@ -13,3 +13,9 @@ export const getBooks = asyncHandler(async (req: Request, res: Response) => {
   const { books } = await bookService.getBooks(userId);
   res.status(200).json({ data: books });
 });
+
+export const getBookById = asyncHandler(async (req: Request, res: Response) => {
+  const bookId = req.params.id;
+  const { book } = await bookService.getBookById(bookId);
+  res.status(200).json({ data: book });
+});
