@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { validateData } from "../middlewares";
+import { authMiddleware, validateData } from "../middlewares";
 import {
   loginSchema,
   SignUpSchema,
@@ -9,6 +9,7 @@ import {
 import {
   forgetPassword,
   login,
+  logout,
   resetPassword,
   signUp,
   verifyOtp,
@@ -24,5 +25,6 @@ authRouter.post(
   forgetPassword
 );
 authRouter.post("/verify-otp", validateData(otpSchema), verifyOtp);
+authRouter.post("/logout", authMiddleware, logout);
 
 export { authRouter };

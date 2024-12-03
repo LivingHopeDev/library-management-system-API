@@ -41,7 +41,7 @@ model Otp {
   expiry DateTime
 
   user User @relation(fields: [userId], references: [id],onDelete:Cascade)
-
+@@index([userId])
   @@map("otps")
 }
 
@@ -58,6 +58,7 @@ model Profile {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+@@index([userId])
 
   @@map("profiles")
 }
@@ -71,6 +72,8 @@ model Session {
   sessionToken  String
   expiresAt   DateTime
   createdAt  DateTime @default(now())
+
+@@index([userId])
 
   @@map("sessions")
 }

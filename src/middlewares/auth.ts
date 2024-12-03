@@ -17,7 +17,7 @@ export const authMiddleware = async (
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       res.status(401).json({
         status_code: "401",
-        message: "Invalid token",
+        message: "Invalid token ",
       });
       return;
     }
@@ -26,7 +26,7 @@ export const authMiddleware = async (
     if (!token) {
       res.status(401).json({
         status_code: "401",
-        message: "Invalid token",
+        message: "Invalid token ",
       });
       return;
     }

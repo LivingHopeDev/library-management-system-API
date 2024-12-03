@@ -48,5 +48,8 @@ export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  debugger;
+  const token = req.headers.authorization.split(" ")[1];
+  const userId = req.user.id;
+  const { message } = await authService.logout(userId, token);
+  res.status(200).json({ message: message });
 });

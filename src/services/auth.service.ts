@@ -105,6 +105,15 @@ export class AuthService {
     };
   }
 
+  public async logout(userId: string, token: string): Promise<{ message }> {
+    await prismaClient.session.delete({
+      where: { userId, sessionToken: token },
+    });
+
+    return {
+      message: "Logout sucessful",
+    };
+  }
   public async forgotPassword(email: string): Promise<{ message: string }> {
     const user = await prismaClient.user.findFirst({
       where: { email: email },
