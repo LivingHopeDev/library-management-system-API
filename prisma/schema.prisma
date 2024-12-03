@@ -26,9 +26,10 @@ model User {
   accountType accountType @default(user)
   is_verified Boolean     @default(false)
   createdAt   DateTime    @default(now())
-  updaredAt   DateTime    @updatedAt
+  updatedAt   DateTime    @updatedAt
   otp         Otp[]
   profile     Profile?
+  session     Session?
 
   @@map("users")
 }
@@ -56,7 +57,20 @@ model Profile {
   user        User   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
-  updaredAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@map("profiles")
+}
+
+
+model Session {
+  id        String @default(uuid()) @id @unique
+  userId    String  @unique
+  user      User @relation(fields: [userId],references: [id])
+
+  sessionToken  String
+  expiresAt   DateTime
+  createdAt  DateTime @default(now())
+
+  @@map("sessions")
 }

@@ -39,6 +39,15 @@ export const authMiddleware = async (
         });
         return;
       }
+      const session = await prismaClient.session.findFirst({
+        where: { sessionToken: token },
+      });
+      if (!session || new Date() > session.expiresAt) {
+        return res.status(401).json({
+          status_code: "401",
+          message: "Session expired or invalid",
+        });
+      }
       const user = await prismaClient.user.findFirst({
         where: { id: decoded["userId"] as string },
       });

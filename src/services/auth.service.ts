@@ -4,6 +4,7 @@ import {
   ResourceNotFound,
   Expired,
   BadRequest,
+  Unauthorised,
 } from "../middlewares";
 import { IUserLogin, IUserSignUp } from "../types";
 import { accountType, User } from "@prisma/client";
@@ -16,6 +17,7 @@ import {
 import { addEmailToQueue } from "../utils/queue";
 import { OtpService, EmailService } from ".";
 import config from "../config";
+
 export class AuthService {
   private otpService = new OtpService();
   private emailService = new EmailService();
@@ -67,6 +69,7 @@ export class AuthService {
   }> {
     const { email, password } = payload;
     const userExist = await prismaClient.user.findFirst({ where: { email } });
+
     if (!userExist) {
       throw new ResourceNotFound("Authentication failed");
     }
@@ -74,7 +77,25 @@ export class AuthService {
     if (!isPassword) {
       throw new ResourceNotFound("Authentication failed");
     }
+    if (!userExist.is_verified) {
+      throw new Unauthorised(
+        "Email verification required. Please verify your email to proceed."
+      );
+    }
     const accessToken = await generateAccessToken(userExist.id);
+    const expiresAt = new Date();
+    expiresAt.setDate(
+      expiresAt.getDate() + parseInt(config.TOKEN_EXPIRY.replace("d", ""), 10)
+    );
+
+    await prismaClient.session.create({
+      data: {
+        userId: userExist.id,
+        sessionToken: accessToken,
+        expiresAt: expiresAt,
+      },
+    });
+
     const user = {
       username: userExist.username,
       email: userExist.email,
