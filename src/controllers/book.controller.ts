@@ -7,3 +7,9 @@ export const addBook = asyncHandler(async (req: Request, res: Response) => {
   const { message, book } = await bookService.addBook(req.body, userId);
   res.status(201).json({ message, data: book });
 });
+
+export const getBooks = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user.id;
+  const { books } = await bookService.getBooks(userId);
+  res.status(200).json({ data: books });
+});

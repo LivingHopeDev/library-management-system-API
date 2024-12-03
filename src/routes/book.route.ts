@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addBook } from "../controllers/book.controller";
+import { addBook, getBooks } from "../controllers/book.controller";
 import { adminMiddleware, authMiddleware, validateData } from "../middlewares";
 import { BookSchema } from "../schema/book.schema";
 
@@ -12,8 +12,7 @@ bookRouter.post(
   adminMiddleware,
   addBook
 );
-bookRouter.get("/", authMiddleware, addBook);
-bookRouter.get("/:id", authMiddleware, addBook);
+bookRouter.get("/", authMiddleware, getBooks);
 
 bookRouter.patch(
   "/:id",

@@ -17,4 +17,19 @@ export class BookService {
       book,
     };
   }
+  public async getBooks(
+    userId?: string
+  ): Promise<{ books: IBook[]; message?: string }> {
+    const books = await prismaClient.book.findMany({
+      where: { author: userId },
+    });
+
+    if (books.length === 0) {
+      return {
+        message: "No book uploaded yet",
+        books: [],
+      };
+    }
+    return { books };
+  }
 }
