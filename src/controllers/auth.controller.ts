@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import asyncHandler from "../middlewares/asyncHandler";
-import { AuthService } from "../services";
+import { AuthService, OtpService } from "../services";
 
 const authService = new AuthService();
+const otpService = new OtpService();
 export const signUp = asyncHandler(async (req: Request, res: Response) => {
   const { message, user } = await authService.signUp(req.body);
   res.status(201).json({ status: 201, message, data: { user } });
@@ -36,3 +37,12 @@ export const resetPassword = asyncHandler(
     return res.status(200).json({ status_code: 200, message });
   }
 );
+
+export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
+  const { token } = req.body;
+  const { message } = await otpService.verifyOtp(token);
+  res.status(200).json({
+    status_code: 200,
+    message,
+  });
+});
