@@ -66,19 +66,19 @@ export const authMiddleware = async (
     throw new ServerError("INTERNAL_SERVER_ERROR");
   }
 };
-// export const adminMiddleware = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const user = req.user;
-//   if (user?.role === "ADMIN") {
-//     next();
-//   } else {
-//      res.status(403).json({
-//       status_code: "403",
-//       message: "Unauthorized",
-//     });
-// return
-//   }
-// };
+export const adminMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user;
+  if (user?.accountType === "admin") {
+    next();
+  } else {
+    res.status(403).json({
+      status_code: "403",
+      message: "Unauthorized",
+    });
+    return;
+  }
+};

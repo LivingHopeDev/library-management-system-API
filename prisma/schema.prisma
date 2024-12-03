@@ -30,6 +30,7 @@ model User {
   otp         Otp[]
   profile     Profile?
   session     Session?
+  book        Book[]
 
   @@map("users")
 }
@@ -40,8 +41,9 @@ model Otp {
   userId String
   expiry DateTime
 
-  user User @relation(fields: [userId], references: [id],onDelete:Cascade)
-@@index([userId])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
   @@map("otps")
 }
 
@@ -58,22 +60,34 @@ model Profile {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-@@index([userId])
 
+  @@index([userId])
   @@map("profiles")
 }
 
-
 model Session {
-  id        String @default(uuid()) @id @unique
-  userId    String  @unique
-  user      User @relation(fields: [userId],references: [id])
+  id     String @id @unique @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
 
-  sessionToken  String
-  expiresAt   DateTime
-  createdAt  DateTime @default(now())
+  sessionToken String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
 
-@@index([userId])
-
+  @@index([userId])
   @@map("sessions")
+}
+
+model Book {
+  id           String   @id @unique @default(uuid())
+  title        String
+  genre        String
+  availability Boolean  @default(false)
+  author       String
+  user         User     @relation(fields: [author], references: [id])
+  description  String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("books")
 }
