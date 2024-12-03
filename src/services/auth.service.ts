@@ -87,13 +87,10 @@ export class AuthService {
     expiresAt.setDate(
       expiresAt.getDate() + parseInt(config.TOKEN_EXPIRY.replace("d", ""), 10)
     );
-
-    await prismaClient.session.create({
-      data: {
-        userId: userExist.id,
-        sessionToken: accessToken,
-        expiresAt: expiresAt,
-      },
+    await prismaClient.session.upsert({
+      where: { userId: userExist.id },
+      update: { sessionToken: accessToken, expiresAt },
+      create: { userId: userExist.id, sessionToken: accessToken, expiresAt },
     });
 
     const user = {

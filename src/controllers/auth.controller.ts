@@ -46,3 +46,7 @@ export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
     message,
   });
 });
+
+export const logout = asyncHandler(async (req: Request, res: Response) => {
+  debugger;
+});
