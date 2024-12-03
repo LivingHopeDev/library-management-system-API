@@ -58,4 +58,21 @@ export class BookService {
       book: updatedBook,
     };
   }
+  public async deleteBook(
+    bookId: string,
+    userId: string
+  ): Promise<{ message: string }> {
+    const existingBook = await prismaClient.book.findUnique({
+      where: { id: bookId },
+    });
+    if (!existingBook) {
+      throw new ResourceNotFound("Book not found or access denied");
+    }
+
+    await prismaClient.book.delete({
+      where: { id: bookId },
+    });
+
+    return { message: "Book deleted successfully" };
+  }
 }
