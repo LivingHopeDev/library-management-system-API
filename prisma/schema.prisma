@@ -19,18 +19,19 @@ enum accountType {
 }
 
 model User {
-  id          String      @id @unique @default(uuid())
-  username    String
-  email       String      @unique
-  password    String
-  accountType accountType @default(user)
-  is_verified Boolean     @default(false)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  otp         Otp[]
-  profile     Profile?
-  session     Session?
-  borrowedBook  BorrowedBook[]
+  id           String         @id @unique @default(uuid())
+  username     String
+  email        String         @unique
+  password     String
+  accountType  accountType    @default(user)
+  is_verified  Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  otp          Otp[]
+  profile      Profile?
+  session      Session?
+  borrowedBook BorrowedBook[]
+  reservedBook ReservedBook[]
 
   @@map("users")
 }
@@ -79,30 +80,45 @@ model Session {
 }
 
 model Book {
-  id           String   @id @unique @default(uuid())
+  id           String         @id @unique @default(uuid())
   title        String
   genre        String
-  availability Boolean  @default(true)
-  copies      Int      @default(1) 
+  availability Boolean        @default(true)
+  copies       Int            @default(1)
   author       String
   description  String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   borrowedBook BorrowedBook[]
+  reservedBook ReservedBook[]
 
   @@map("books")
 }
 
 model BorrowedBook {
-  id          String   @default(uuid()) @id @unique
-  borrowedBy      String
-  user        User     @relation(fields: [borrowedBy], references: [id])
-  bookId      String
-  book        Book     @relation(fields: [bookId], references: [id])
-  borrowedAt  DateTime @default(now())
-  returnedAt  DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String    @id @unique @default(uuid())
+  borrowedBy String
+  user       User      @relation(fields: [borrowedBy], references: [id])
+  bookId     String
+  book       Book      @relation(fields: [bookId], references: [id])
+  borrowedAt DateTime  @default(now())
+  returnedAt DateTime?
+  dueDate    DateTime
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@map("borrowed_books")
+}
+
+model ReservedBook {
+  id         String   @id @unique @default(uuid())
+  reservedBy String
+  user       User     @relation(fields: [reservedBy], references: [id])
+  bookId     String
+  book       Book     @relation(fields: [bookId], references: [id])
+ dateReserved DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("reserved_books")
 }

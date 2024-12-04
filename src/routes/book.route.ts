@@ -5,6 +5,7 @@ import {
   deleteBook,
   getBookById,
   getBooks,
+  renewBook,
   returnBook,
   updateBook,
 } from "../controllers/book.controller";
@@ -35,5 +36,6 @@ bookRouter.delete("/:id", authMiddleware, adminMiddleware, deleteBook);
 
 bookRouter.post("/borrow", authMiddleware, borrowBook);
 bookRouter.post("/return", authMiddleware, returnBook);
+bookRouter.post("/renew", authMiddleware, renewBook);
 
 export { bookRouter };

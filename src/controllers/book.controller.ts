@@ -75,6 +75,7 @@ export const borrowBook = asyncHandler(async (req: Request, res: Response) => {
         copies: borrowedBook.book.copies,
       },
       dateBorrow: borrowedBook.borrowedAt,
+      expectedReturnDate: borrowedBook.dueDate,
       borrowedBy: {
         id: borrowedBook.user.id,
         name: borrowedBook.user.username,
@@ -116,4 +117,17 @@ export const returnBook = asyncHandler(async (req: Request, res: Response) => {
   };
 
   res.status(201).json(formattedResponse);
+});
+
+export const renewBook = asyncHandler(async (req: Request, res: Response) => {
+  const { bookId } = req.body;
+  const userId = req.user.id;
+
+  const { message } = await bookService.renewBook(bookId, userId);
+
+  res.status(200).json({
+    status: 200,
+    message,
+    data: [],
+  });
 });

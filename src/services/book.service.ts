@@ -105,6 +105,7 @@ export class BookService {
       book: Partial<Book>;
       user: Partial<User>;
       borrowedAt: Date;
+      dueDate: Date;
     };
   }> {
     const result = await prismaClient.$transaction(async (tx) => {
@@ -127,12 +128,16 @@ export class BookService {
           availability: book.copies - 1 > 0,
         },
       });
-
+      const currentDate = new Date();
+      const expectedReturnDate = new Date(
+        currentDate.getTime() + 14 * 24 * 60 * 60 * 1000 // 14 days borrow period
+      );
       const borrowedBook = await tx.borrowedBook.create({
         data: {
           borrowedBy: userId,
           bookId,
           borrowedAt: new Date(),
+          dueDate: expectedReturnDate,
         },
       });
 
@@ -142,6 +147,7 @@ export class BookService {
         book: updatedBook,
         user,
         borrowedAt: borrowedBook.borrowedAt,
+        dueDate: borrowedBook.dueDate,
       };
     });
 
@@ -190,6 +196,82 @@ export class BookService {
     return {
       message: "Book returned successfully",
       returnedBook: result,
+    };
+  }
+
+  public async renewBook(
+    bookId: string,
+    userId: string
+  ): Promise<{
+    message: string;
+  }> {
+    const result = await prismaClient.$transaction(async (tx) => {
+      const borrowedBook = await tx.borrowedBook.findFirst({
+        where: { bookId, borrowedBy: userId, returnedAt: null },
+      });
+
+      if (!borrowedBook) {
+        throw new ResourceNotFound(
+          "You have not borrowed this book or it has been returned."
+        );
+      }
+
+      // Check if the due date is already passed, denying renewal
+      if (borrowedBook.dueDate < new Date()) {
+        throw new Conflict(
+          "Your borrow period has expired. Please return the book."
+        );
+      }
+
+      // Retrieve any reservation data for the book
+      const reservedBook = await tx.reservedBook.findFirst({
+        where: { bookId },
+      });
+
+      const currentDate = new Date();
+      let newDueDate = new Date();
+      let remainingDays = 14; // Default borrowing period is 14 days
+
+      if (reservedBook) {
+        const reservedDate = reservedBook.dateReserved;
+        const timeDiff =
+          new Date(reservedDate).getTime() - currentDate.getTime();
+        const daysDiff = timeDiff / (1000 * 3600 * 24); // Convert milliseconds to days
+
+        // If the days difference is less than 14, we calculate the remaining days
+        if (daysDiff < 14) {
+          // Remove 2 days from the remaining days to avoid story because of the user that has reserved it
+          const remainingDaysBeforePenalty = daysDiff - 2;
+
+          // If the remaining days after subtracting 2 are <= 0, deny renewal
+          if (remainingDaysBeforePenalty <= 0) {
+            throw new Conflict("The book will not be available for renewal.");
+          }
+
+          remainingDays = remainingDaysBeforePenalty;
+          newDueDate = new Date(
+            currentDate.getTime() + remainingDays * 24 * 60 * 60 * 1000
+          ); // Set the new due date
+        }
+      } else {
+        // No reservation: Default is to give the full 14 days
+        newDueDate = new Date(currentDate.getTime() + 14 * 24 * 60 * 60 * 1000);
+      }
+
+      await tx.borrowedBook.update({
+        where: { id: borrowedBook.id },
+        data: {
+          dueDate: newDueDate,
+        },
+      });
+
+      return {
+        remainingDays,
+      };
+    });
+
+    return {
+      message: `Book renewed successfully. You can borrow the book for ${result.remainingDays} more day(s).`,
     };
   }
 }
