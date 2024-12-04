@@ -85,3 +85,35 @@ export const borrowBook = asyncHandler(async (req: Request, res: Response) => {
 
   res.status(201).json(formattedResponse);
 });
+
+export const returnBook = asyncHandler(async (req: Request, res: Response) => {
+  const { bookId } = req.body;
+  const userId = req.user.id;
+
+  const { message, returnedBook } = await bookService.returnBook(
+    bookId,
+    userId
+  );
+
+  const formattedResponse = {
+    status: 201,
+    message,
+    data: {
+      book: {
+        title: returnedBook.book.title,
+        author: {
+          id: returnedBook.book.id,
+          name: returnedBook.book.author,
+        },
+        genre: returnedBook.book.genre,
+        description: returnedBook.book.description,
+        createdAt: returnedBook.book.createdAt,
+        updatedAt: returnedBook.book.updatedAt,
+        availability: returnedBook.book.availability,
+        copies: returnedBook.book.copies,
+      },
+    },
+  };
+
+  res.status(201).json(formattedResponse);
+});

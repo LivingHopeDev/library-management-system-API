@@ -6,5 +6,5 @@ export const BookSchema = z.object({
   genre: z.string(),
   availability: z.boolean(),
   author: z.string(),
-  copies: z.number().optional(),
+  copies: z.number().positive().optional(),
 });

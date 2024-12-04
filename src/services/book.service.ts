@@ -144,4 +144,46 @@ export class BookService {
       borrowedBook: result,
     };
   }
+  public async returnBook(
+    bookId: string,
+    userId: string
+  ): Promise<{
+    message: string;
+    returnedBook: {
+      book: Partial<Book>;
+    };
+  }> {
+    const result = await prismaClient.$transaction(async (tx) => {
+      const book = await tx.book.findUnique({ where: { id: bookId } });
+      const borrowedBookExist = await tx.borrowedBook.findFirst({
+        where: { bookId, borrowedBy: userId },
+      });
+
+      if (!borrowedBookExist) {
+        throw new ResourceNotFound("No record of borrowed Book!");
+      }
+      await tx.borrowedBook.update({
+        where: { id: borrowedBookExist.id },
+        data: {
+          returnedAt: new Date(),
+        },
+      });
+      const updatedBook = await tx.book.update({
+        where: { id: bookId },
+        data: {
+          copies: book.copies + 1,
+          availability: book.copies + 1 > 0,
+        },
+      });
+
+      return {
+        book: updatedBook,
+      };
+    });
+
+    return {
+      message: "Book returned successfully",
+      returnedBook: result,
+    };
+  }
 }
