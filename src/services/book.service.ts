@@ -109,7 +109,13 @@ export class BookService {
   }> {
     const result = await prismaClient.$transaction(async (tx) => {
       const book = await tx.book.findUnique({ where: { id: bookId } });
+      const borrowedBookExist = await tx.borrowedBook.findFirst({
+        where: { bookId, borrowedBy: userId },
+      });
 
+      if (borrowedBookExist) {
+        throw new Conflict("You have already borrowed this Book");
+      }
       if (!book || book.copies <= 0) {
         throw new Conflict("No copies available for this book.");
       }
