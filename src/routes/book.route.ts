@@ -8,7 +8,7 @@ import {
   renewBook,
   returnBook,
   updateBook,
-} from "../controllers/book.controller";
+} from "../controllers";
 import { adminMiddleware, authMiddleware, validateData } from "../middlewares";
 import { BookSchema } from "../schema/book.schema";
 

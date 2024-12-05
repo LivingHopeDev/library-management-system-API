@@ -217,6 +217,7 @@ export class BookService {
       }
 
       // Check if the due date is already passed, denying renewal
+      // I want users to be allowed to renew only if they are within the due date
       if (borrowedBook.dueDate < new Date()) {
         throw new Conflict(
           "Your borrow period has expired. Please return the book."
@@ -230,7 +231,7 @@ export class BookService {
 
       const currentDate = new Date();
       let newDueDate = new Date();
-      let remainingDays = 14; // Default borrowing period is 14 days
+      let remainingDays = 14; // I chose the default borrowing period to be 14 days
 
       if (reservedBook) {
         const reservedDate = reservedBook.dateReserved;
@@ -238,7 +239,7 @@ export class BookService {
           new Date(reservedDate).getTime() - currentDate.getTime();
         const daysDiff = timeDiff / (1000 * 3600 * 24); // Convert milliseconds to days
 
-        // If the days difference is less than 14, we calculate the remaining days
+        // If the days difference is less than 14, calculate the remaining days
         if (daysDiff < 14) {
           // Remove 2 days from the remaining days to avoid story because of the user that has reserved it
           const remainingDaysBeforePenalty = daysDiff - 2;

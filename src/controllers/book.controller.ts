@@ -1,6 +1,6 @@
 import asyncHandler from "../middlewares/asyncHandler";
 import { Request, Response } from "express";
-import { BookService } from "../services/book.service";
+import { BookService } from "../services";
 const bookService = new BookService();
 export const addBook = asyncHandler(async (req: Request, res: Response) => {
   const { message, book } = await bookService.addBook(req.body);
