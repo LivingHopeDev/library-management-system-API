@@ -1,6 +1,7 @@
 import { ReservedBook } from "@prisma/client";
 import { prismaClient } from "..";
 import { Conflict, ResourceNotFound } from "../middlewares";
+import asyncHandler from "../middlewares/asyncHandler";
 
 export class ReserveService {
   public async reserveBook(
@@ -51,6 +52,29 @@ export class ReserveService {
     return {
       message: "Book reserved successfully",
       reservedBook: result,
+    };
+  }
+
+  public async cancelReservedBook(
+    userId: string,
+    reserveId: string
+  ): Promise<{ message: string }> {
+    const result = await prismaClient.$transaction(async (tx) => {
+      const isBookReservedByThisUser = await tx.reservedBook.findFirst({
+        where: { reservedBy: userId, id: reserveId },
+      });
+
+      if (!isBookReservedByThisUser) {
+        throw new Conflict("You didn't reserve this book!");
+      }
+
+      await tx.reservedBook.delete({
+        where: { id: reserveId },
+      });
+    });
+
+    return {
+      message: "Book reservation has been cancelled successfully.",
     };
   }
 }

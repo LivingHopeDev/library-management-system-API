@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { reserveBook } from "../controllers";
+import { cancelReservedBook, reserveBook } from "../controllers";
 import { authMiddleware, validateData } from "../middlewares";
 import { ReservedBookSchema } from "../schema/book.schema";
 
@@ -12,4 +12,5 @@ reserverRouter.post(
   reserveBook
 );
 
+reserverRouter.delete("/:id", authMiddleware, cancelReservedBook);
 export { reserverRouter };

@@ -110,6 +110,7 @@ model BorrowedBook {
   @@map("borrowed_books")
 }
 
+
 model ReservedBook {
   id         String   @id @unique @default(uuid())
   reservedBy String
