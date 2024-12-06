@@ -23,7 +23,15 @@ export const ReservedBookSchema = z.object({
         message: "Invalid date format. Please use YYYY-MM-DD format.",
       }
     )
-    .refine((val) => new Date(val).getTime() > new Date().getTime(), {
-      message: "Enter a future date!",
-    }),
+    .refine(
+      (val) => {
+        const reservedDate = new Date(val);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return reservedDate.getTime() >= today.getTime(); // Ensure the reserved date is today or in the future
+      },
+      {
+        message: "Enter a future date, or today's date!",
+      }
+    ),
 });
