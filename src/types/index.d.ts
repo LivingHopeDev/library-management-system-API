@@ -20,5 +20,5 @@ export interface IBook {
   availability: boolean;
   author: string;
   description: string;
-  copies?: number;
+  totalCopies?: number;
 }

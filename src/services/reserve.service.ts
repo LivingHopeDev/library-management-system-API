@@ -1,7 +1,6 @@
 import { ReservedBook } from "@prisma/client";
 import { prismaClient } from "..";
 import { Conflict, ResourceNotFound } from "../middlewares";
-import asyncHandler from "../middlewares/asyncHandler";
 
 export class ReserveService {
   public async reserveBook(

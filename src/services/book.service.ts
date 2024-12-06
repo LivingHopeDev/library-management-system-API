@@ -10,13 +10,16 @@ export class BookService {
     const book = await prismaClient.book.create({
       data: {
         ...payload,
+        availableCopies: payload.totalCopies,
       },
     });
+
     return {
-      message: "Book added successfully ",
+      message: "Book added successfully",
       book,
     };
   }
+
   public async getBooks(query: {
     page?: number;
     limit?: number;
@@ -115,23 +118,28 @@ export class BookService {
       });
 
       if (borrowedBookExist) {
-        throw new Conflict("You have already borrowed this Book");
+        throw new Conflict("You have already borrowed this book.");
       }
-      if (!book || book.copies <= 0) {
+
+      // Check if there are available copies to borrow
+      if (!book || book.availableCopies <= 0) {
         throw new Conflict("No copies available for this book.");
       }
 
+      // Decrease available copies and update the book
       const updatedBook = await tx.book.update({
         where: { id: bookId },
         data: {
-          copies: book.copies - 1,
-          availability: book.copies - 1 > 0,
+          availableCopies: book.availableCopies - 1,
         },
       });
+
       const currentDate = new Date();
       const expectedReturnDate = new Date(
         currentDate.getTime() + 14 * 24 * 60 * 60 * 1000 // 14 days borrow period
       );
+
+      // Create the borrowed book record
       const borrowedBook = await tx.borrowedBook.create({
         data: {
           borrowedBy: userId,
@@ -156,6 +164,7 @@ export class BookService {
       borrowedBook: result,
     };
   }
+
   public async returnBook(
     bookId: string,
     userId: string
@@ -172,19 +181,22 @@ export class BookService {
       });
 
       if (!borrowedBookExist) {
-        throw new ResourceNotFound("No record of borrowed Book!");
+        throw new ResourceNotFound("No record of borrowed book!");
       }
+
+      // Update the borrowedBook record to mark it as returned
       await tx.borrowedBook.update({
         where: { id: borrowedBookExist.id },
         data: {
           returnedAt: new Date(),
         },
       });
+
+      // Increment availableCopies when a book is returned
       const updatedBook = await tx.book.update({
         where: { id: bookId },
         data: {
-          copies: book.copies + 1,
-          availability: book.copies + 1 > 0,
+          availableCopies: book.availableCopies + 1, // Increment available copies
         },
       });
 
