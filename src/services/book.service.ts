@@ -1,7 +1,6 @@
-import { Conflict, ResourceNotFound, ServerError } from "../middlewares";
+import { Conflict, ResourceNotFound } from "../middlewares";
 import { prismaClient } from "..";
 import { IBook } from "../types";
-import { BorrowedBook } from "@prisma/client";
 import { Book, User } from "@prisma/client";
 export class BookService {
   public async addBook(
@@ -196,7 +195,7 @@ export class BookService {
       const updatedBook = await tx.book.update({
         where: { id: bookId },
         data: {
-          availableCopies: book.availableCopies + 1, // Increment available copies
+          availableCopies: book.availableCopies + 1,
         },
       });
 

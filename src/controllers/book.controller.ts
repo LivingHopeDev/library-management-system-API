@@ -72,7 +72,7 @@ export const borrowBook = asyncHandler(async (req: Request, res: Response) => {
         createdAt: borrowedBook.book.createdAt,
         updatedAt: borrowedBook.book.updatedAt,
         availability: borrowedBook.book.availability,
-        copies: borrowedBook.book.copies,
+        copies: borrowedBook.book.totalCopies,
       },
       dateBorrow: borrowedBook.borrowedAt,
       expectedReturnDate: borrowedBook.dueDate,
@@ -111,7 +111,7 @@ export const returnBook = asyncHandler(async (req: Request, res: Response) => {
         createdAt: returnedBook.book.createdAt,
         updatedAt: returnedBook.book.updatedAt,
         availability: returnedBook.book.availability,
-        copies: returnedBook.book.copies,
+        copies: returnedBook.book.totalCopies,
       },
     },
   };
