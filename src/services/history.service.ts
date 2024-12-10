@@ -1,6 +1,6 @@
 import { ResourceNotFound } from "../middlewares";
 import { prismaClient } from "..";
-import { BorrowedBook } from "@prisma/client";
+import { BorrowedBook, Fine } from "@prisma/client";
 
 export class HistoryService {
   public async getBorrowingHistory(

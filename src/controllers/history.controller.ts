@@ -1,6 +1,6 @@
 import asyncHandler from "../middlewares/asyncHandler";
 import { Request, Response } from "express";
-import { HistoryService } from "../services/history.service";
+import { HistoryService } from "../services";
 
 const historyService = new HistoryService();
 export const getBorrowingHistory = asyncHandler(
