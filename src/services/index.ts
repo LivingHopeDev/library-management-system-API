@@ -5,3 +5,6 @@ export * from "./book.service";
 export * from "./reserve.service";
 export * from "./history.service";
 export * from "./fine.service";
+export * from "./transaction.service";
+export * from "./payment.service";
+export * from "./user.service";
