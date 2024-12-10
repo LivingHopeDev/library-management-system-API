@@ -10,7 +10,7 @@ export const addBook = asyncHandler(async (req: Request, res: Response) => {
 export const getBooks = asyncHandler(async (req: Request, res: Response) => {
   const { page, limit, genre, availability } = req.query;
 
-  const { books, total, message } = await bookService.getBooks({
+  const { books, totalPages, message } = await bookService.getBooks({
     page: page ? parseInt(page as string, 10) : undefined,
     limit: limit ? parseInt(limit as string, 10) : undefined,
     genre: genre as string,
@@ -21,7 +21,7 @@ export const getBooks = asyncHandler(async (req: Request, res: Response) => {
     message,
     data: {
       books,
-      total,
+      totalPages,
       page: page || 1,
       limit: limit || 10,
     },

@@ -32,6 +32,7 @@ model User {
   session      Session?
   borrowedBook BorrowedBook[]
   reservedBook ReservedBook[]
+  fine         Fine[]
 
   @@map("users")
 }
@@ -57,7 +58,7 @@ model Profile {
   country     String
   state       String
   userId      String @unique
-  user        User   @relation(fields: [userId], references: [id])
+  user        User   @relation(fields: [userId], references: [id],onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -69,7 +70,7 @@ model Profile {
 model Session {
   id     String @id @unique @default(uuid())
   userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id],onDelete: Cascade)
 
   sessionToken String
   expiresAt    DateTime
@@ -80,19 +81,20 @@ model Session {
 }
 
 model Book {
-  id           String         @id @unique @default(uuid())
-  title        String
-  genre        String
-  availability Boolean        @default(true)
-    totalCopies    Int         @default(1)
-  reservedCopies Int         @default(0)
-  availableCopies Int    @default(1)
-  author       String
-  description  String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  borrowedBook BorrowedBook[]
-  reservedBook ReservedBook[]
+  id              String         @id @unique @default(uuid())
+  title           String
+  genre           String
+  availability    Boolean        @default(true)
+  totalCopies     Int            @default(1)
+  reservedCopies  Int            @default(0)
+  availableCopies Int            @default(1)
+  author          String
+  description     String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  borrowedBook    BorrowedBook[]
+  reservedBook    ReservedBook[]
+  fine            Fine[]
 
   @@map("books")
 }
@@ -100,28 +102,42 @@ model Book {
 model BorrowedBook {
   id         String    @id @unique @default(uuid())
   borrowedBy String
-  user       User      @relation(fields: [borrowedBy], references: [id])
+  user       User      @relation(fields: [borrowedBy], references: [id],onDelete: Cascade)
   bookId     String
-  book       Book      @relation(fields: [bookId], references: [id])
+  book       Book      @relation(fields: [bookId], references: [id],onDelete: Cascade)
   borrowedAt DateTime  @default(now())
   returnedAt DateTime?
   dueDate    DateTime
+  isFinePaid Boolean   @default(false)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
   @@map("borrowed_books")
 }
 
-
 model ReservedBook {
-  id         String   @id @unique @default(uuid())
-  reservedBy String
-  user       User     @relation(fields: [reservedBy], references: [id])
-  bookId     String
-  book       Book     @relation(fields: [bookId], references: [id])
- dateReserved DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id           String   @id @unique @default(uuid())
+  reservedBy   String
+  user         User     @relation(fields: [reservedBy], references: [id],onDelete: Cascade)
+  bookId       String
+  book         Book     @relation(fields: [bookId], references: [id],onDelete: Cascade)
+  dateReserved DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("reserved_books")
+}
+
+model Fine {
+  id        String   @id @unique @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id],onDelete: Cascade)
+  currency  String   @default("USD")
+  amount    Float
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id],onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("fines")
 }

@@ -24,14 +24,14 @@ export class BookService {
     limit?: number;
     genre?: string;
     availability?: string;
-  }): Promise<{ books: IBook[]; total: number; message?: string }> {
+  }): Promise<{ books: IBook[]; totalPages: number; message?: string }> {
     const { page = 1, limit = 10, genre, availability } = query;
 
     const filters: Record<string, any> = {};
     if (genre) filters.genre = genre;
     if (availability) filters.availability = availability === "true";
 
-    const [books, total] = await Promise.all([
+    const [books, totalRecords] = await Promise.all([
       prismaClient.book.findMany({
         where: filters,
         skip: (page - 1) * limit,
@@ -40,16 +40,17 @@ export class BookService {
       }),
       prismaClient.book.count({ where: filters }),
     ]);
+    const totalPages = Math.ceil(totalRecords / limit);
 
     if (books.length === 0) {
       return {
         message: "No books match the specified criteria.",
         books: [],
-        total,
+        totalPages,
       };
     }
 
-    return { message: "Books retrieved successfully.", books, total };
+    return { message: "Books retrieved successfully.", books, totalPages };
   }
 
   public async getBookById(bookId: string): Promise<{ book: Partial<IBook> }> {
@@ -174,6 +175,7 @@ export class BookService {
     };
   }> {
     const result = await prismaClient.$transaction(async (tx) => {
+      const FINE_PAY_DAY = 1; // $ 1
       const book = await tx.book.findUnique({ where: { id: bookId } });
       const borrowedBookExist = await tx.borrowedBook.findFirst({
         where: { bookId, borrowedBy: userId },
@@ -181,6 +183,23 @@ export class BookService {
 
       if (!borrowedBookExist) {
         throw new ResourceNotFound("No record of borrowed book!");
+      }
+      if (!borrowedBookExist.returnedAt) {
+        const currentDate = new Date();
+        const isOverDue = currentDate > borrowedBookExist.dueDate;
+        if (isOverDue) {
+          const daysLate = Math.ceil(
+            (currentDate.getTime() - borrowedBookExist.dueDate.getTime()) /
+              (24 * 60 * 60 * 1000)
+          );
+          const fineAmount = daysLate * FINE_PAY_DAY;
+
+          if (!borrowedBookExist.isFinePaid) {
+            throw new Conflict(
+              `Return blocked: Your book is ${daysLate} days overdue. Pay the fine of $${fineAmount}.`
+            );
+          }
+        }
       }
 
       // Update the borrowedBook record to mark it as returned

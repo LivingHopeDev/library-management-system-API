@@ -35,3 +35,5 @@ export const ReservedBookSchema = z.object({
       }
     ),
 });
+
+const borrowedBookQuerySchema = z.object({});
