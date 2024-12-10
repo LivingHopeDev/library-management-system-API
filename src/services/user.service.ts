@@ -1,5 +1,6 @@
-import { User } from "@prisma/client";
+import { Profile, User } from "@prisma/client";
 import { prismaClient } from "..";
+import { ResourceNotFound, Conflict } from "../middlewares";
 
 export class UserService {
   public async getAllUsers(query: {
@@ -26,5 +27,41 @@ export class UserService {
       users,
       totalPages,
     };
+  }
+
+  public async updateProfile(
+    userId: string,
+    profileData: Partial<Profile>
+  ): Promise<{ message: string; data: Profile }> {
+    const user = await prismaClient.user.findUnique({
+      where: { id: userId },
+      include: { profile: true },
+    });
+
+    if (!user) {
+      throw new ResourceNotFound("User not found");
+    }
+
+    if (!user.profile) {
+      const newProfile = await prismaClient.profile.create({
+        data: {
+          userId,
+          name: profileData.name,
+          address: profileData.address,
+          phone: profileData.phone,
+          country: profileData.country,
+          state: profileData.state,
+          countryCode: profileData.countryCode,
+        },
+      });
+      return { message: "Profile update successfully", data: newProfile };
+    }
+
+    const updatedProfile = await prismaClient.profile.update({
+      where: { userId },
+      data: profileData,
+    });
+
+    return { message: "Profile update successfully", data: updatedProfile };
   }
 }

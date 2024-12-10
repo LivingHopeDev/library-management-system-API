@@ -17,3 +17,11 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
     limit: limit || 10,
   });
 });
+export const updateProfile = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user.id;
+
+    const { message, data } = await userService.updateProfile(userId, req.body);
+    res.status(200).json({ message, data });
+  }
+);
