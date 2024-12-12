@@ -120,4 +120,22 @@ export class UserService {
       data: { user: updatedUser, profile: updatedProfile },
     };
   }
+
+  public async deleteUser(userId: string): Promise<{ message: string }> {
+    const user = await prismaClient.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new ResourceNotFound("User not found");
+    }
+    const userDeleted = await prismaClient.user.delete({
+      where: { id: userId },
+    });
+    if (!userDeleted) {
+      return {
+        message: "Failed to delete User",
+      };
+    }
+    return {
+      message: "User deleted successfully",
+    };
+  }
 }
