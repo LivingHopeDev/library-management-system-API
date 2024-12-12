@@ -41,6 +41,6 @@ export const updateUserProfile = asyncHandler(
 
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.params.id as string;
-  const { message, data } = await userService.deleteUser(userId);
-  res.status(200).json({ message, data });
+  const { message } = await userService.deleteUser(userId);
+  res.status(200).json({ message });
 });
