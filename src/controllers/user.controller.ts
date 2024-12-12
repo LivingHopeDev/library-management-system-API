@@ -25,3 +25,16 @@ export const updateProfile = asyncHandler(
     res.status(200).json({ message, data });
   }
 );
+
+//for admin
+export const updateUserProfile = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.params.id as string;
+    console.log(userId);
+    const { message, data } = await userService.updateUserProfile(
+      userId,
+      req.body
+    );
+    res.status(200).json({ message, data });
+  }
+);
