@@ -67,39 +67,57 @@ export class UserService {
 
   public async updateUserProfile(
     userId: string,
-    profileData: Partial<Profile>
-  ): Promise<{ message: string; data: Profile }> {
-    console.log("service", userId);
+    profileData: Partial<Profile & User>
+  ): Promise<{ message: string; data: { user: User; profile: Profile } }> {
+    const { username, email, accountType, ...profileDetails } = profileData;
+    const { name, address, phone, country, state, countryCode } =
+      profileDetails;
+
+    // Fetch the user and include their profile
     const user = await prismaClient.user.findUnique({
       where: { id: userId },
       include: { profile: true },
     });
 
-    // console.log(user);
     if (!user) {
       throw new ResourceNotFound("User not found");
     }
 
-    if (!user.profile) {
-      const newProfile = await prismaClient.profile.create({
-        data: {
-          userId,
-          name: profileData.name,
-          address: profileData.address,
-          phone: profileData.phone,
-          country: profileData.country,
-          state: profileData.state,
-          countryCode: profileData.countryCode,
-        },
+    // Update User model fields (if provided)
+    let updatedUser: Profile | User = user;
+    if (username || email || accountType) {
+      updatedUser = await prismaClient.user.update({
+        where: { id: userId },
+        data: { username, email, accountType },
       });
-      return { message: "Profile update successfully", data: newProfile };
     }
 
-    const updatedProfile = await prismaClient.profile.update({
-      where: { userId },
-      data: profileData,
-    });
+    // Handle Profile fields
+    let updatedProfile = user.profile;
+    if (Object.keys(profileDetails).length > 0) {
+      if (!user.profile) {
+        updatedProfile = await prismaClient.profile.create({
+          data: {
+            userId,
+            name,
+            address,
+            phone,
+            country,
+            state,
+            countryCode,
+          },
+        });
+      } else {
+        updatedProfile = await prismaClient.profile.update({
+          where: { userId },
+          data: profileDetails,
+        });
+      }
+    }
 
-    return { message: "Profile update successfully", data: updatedProfile };
+    return {
+      message: "User details updated successfully",
+      data: { user: updatedUser, profile: updatedProfile },
+    };
   }
 }
