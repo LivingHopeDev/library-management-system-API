@@ -14,10 +14,11 @@ export const payFine = asyncHandler(async (req: Request, res: Response) => {
 
 export const verifyPayment = asyncHandler(
   async (req: Request, res: Response) => {
-    const response = await paymentService.verifyPayment(req.body);
+    const { message, borrowedBook, fine } =
+      await paymentService.processPaymentVerification(req.body);
     res.status(201).json({
-      message: "Payment verified successfully",
-      data: response,
+      message,
+      data: { borrowedBook, fine },
     });
   }
 );

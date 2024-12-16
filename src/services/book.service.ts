@@ -175,6 +175,9 @@ export class BookService {
         where: { borrowedBy: userId },
         skip: (page - 1) * limit,
         take: limit,
+        include: {
+          book: true,
+        },
       }),
       prismaClient.borrowedBook.count(),
     ]);
