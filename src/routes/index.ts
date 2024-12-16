@@ -14,7 +14,7 @@ rootRouter.use("/books", bookRouter);
 rootRouter.use("/reserve", reserverRouter);
 rootRouter.use("/history", historyRouter);
 rootRouter.use("/fines", fineRouter);
-rootRouter.use("/transaction", transactionRouter);
+rootRouter.use("/transactions", transactionRouter);
 rootRouter.use("/payments", paymentRouter);
 rootRouter.use("/users", userRouter);
 

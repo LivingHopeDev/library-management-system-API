@@ -1,10 +1,22 @@
 import { Router } from "express";
-import { cancelReservedBook, reserveBook } from "../controllers";
-import { authMiddleware, validateData } from "../middlewares";
+import {
+  getAllTransactions,
+  getTransactionById,
+  deleteTransaction,
+} from "../controllers";
+import { adminMiddleware, authMiddleware, validateData } from "../middlewares";
 
 const transactionRouter = Router();
 
-transactionRouter.post("/", authMiddleware, reserveBook);
+transactionRouter.get("/me", authMiddleware, getAllTransactions); // For Users
 
-// transactionRouter.delete("/:id", authMiddleware, cancelReservedBook);
+transactionRouter.get("/", authMiddleware, getAllTransactions);
+transactionRouter.get("/:id", authMiddleware, getTransactionById);
+transactionRouter.delete(
+  "/:id",
+  authMiddleware,
+  adminMiddleware,
+  deleteTransaction
+);
+
 export { transactionRouter };
