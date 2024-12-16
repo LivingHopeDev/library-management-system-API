@@ -3,8 +3,10 @@ import {
   addBook,
   borrowBook,
   deleteBook,
+  getAllBorrowedBooks,
   getBookById,
   getBooks,
+  getBorrowedBooks,
   renewBook,
   returnBook,
   updateBook,
@@ -22,6 +24,14 @@ bookRouter.post(
   addBook
 );
 bookRouter.get("/", authMiddleware, getBooks);
+bookRouter.get("/borrow/retrieve", authMiddleware, getBorrowedBooks);
+bookRouter.get(
+  "/borrow/retrieve-all",
+  authMiddleware,
+  adminMiddleware,
+  getAllBorrowedBooks
+);
+
 bookRouter.get("/:id", authMiddleware, getBookById);
 
 bookRouter.patch(

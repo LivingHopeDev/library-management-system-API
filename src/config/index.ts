@@ -14,6 +14,7 @@ const config = {
   REDIS_PORT: process.env.REDIS_PORT || 6379,
   REDIS_PASSWORD: process.env.REDIS_PASSWORD || null, // Optional,
   PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
+  EXCHANGE_RATE_API_KEY: process.env.EXCHANGE_RATE_API_KEY,
 };
 
 export default config;

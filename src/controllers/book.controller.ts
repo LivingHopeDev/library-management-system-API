@@ -1,6 +1,7 @@
 import asyncHandler from "../middlewares/asyncHandler";
 import { Request, Response } from "express";
 import { BookService } from "../services";
+import exp from "constants";
 const bookService = new BookService();
 export const addBook = asyncHandler(async (req: Request, res: Response) => {
   const { message, book } = await bookService.addBook(req.body);
@@ -84,9 +85,41 @@ export const borrowBook = asyncHandler(async (req: Request, res: Response) => {
     },
   };
 
-  res.status(201).json(formattedResponse);
+  res.status(200).json(formattedResponse);
 });
 
+export const getBorrowedBooks = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user.id;
+    const { page, limit } = req.query;
+
+    const { message, data, totalPages } = await bookService.getBorrowedBooks(
+      userId,
+      {
+        page: page ? parseInt(page as string) : undefined,
+        limit: limit ? parseInt(limit as string) : undefined,
+      }
+    );
+    res
+      .status(200)
+      .json({ message, data, page: page || 1, limit: limit || 10, totalPages });
+  }
+);
+export const getAllBorrowedBooks = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { page, limit } = req.query;
+
+    const { message, data, totalPages } = await bookService.getAllBorrowedBooks(
+      {
+        page: page ? parseInt(page as string) : undefined,
+        limit: limit ? parseInt(limit as string) : undefined,
+      }
+    );
+    res
+      .status(200)
+      .json({ message, data, page: page || 1, limit: limit || 10, totalPages });
+  }
+);
 export const returnBook = asyncHandler(async (req: Request, res: Response) => {
   const { bookId } = req.body;
   const userId = req.user.id;

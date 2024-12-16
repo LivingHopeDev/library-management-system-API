@@ -1,7 +1,7 @@
 import { Conflict, ResourceNotFound } from "../middlewares";
 import { prismaClient } from "..";
 import { IBook } from "../types";
-import { Book, User } from "@prisma/client";
+import { Book, BorrowedBook, User } from "@prisma/client";
 export class BookService {
   public async addBook(
     payload: IBook
@@ -165,6 +165,64 @@ export class BookService {
     };
   }
 
+  public async getBorrowedBooks(
+    userId: string,
+    query: { page: number; limit: number }
+  ): Promise<{ message: string; data: BorrowedBook[]; totalPages: number }> {
+    const { page = 1, limit = 10 } = query;
+    const [borrowedBooks, totalRecords] = await Promise.all([
+      prismaClient.borrowedBook.findMany({
+        where: { borrowedBy: userId },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prismaClient.borrowedBook.count(),
+    ]);
+    const totalPages = Math.ceil(totalRecords / limit);
+    if (borrowedBooks.length === 0) {
+      return {
+        message: "No book has been borrowed",
+        data: borrowedBooks,
+        totalPages,
+      };
+    }
+    return {
+      message: "Borrowed books retrieved",
+      data: borrowedBooks,
+      totalPages,
+    };
+  }
+  // For Admin
+  public async getAllBorrowedBooks(query: {
+    page: number;
+    limit: number;
+  }): Promise<{ message: string; data: BorrowedBook[]; totalPages: number }> {
+    const { page = 1, limit = 10 } = query;
+    const [borrowedBooks, totalRecords] = await Promise.all([
+      prismaClient.borrowedBook.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          user: true,
+          book: true,
+        },
+      }),
+      prismaClient.borrowedBook.count(),
+    ]);
+    const totalPages = Math.ceil(totalRecords / limit);
+    if (borrowedBooks.length === 0) {
+      return {
+        message: "No book has been borrowed",
+        data: borrowedBooks,
+        totalPages,
+      };
+    }
+    return {
+      message: "Borrowed books retrieved",
+      data: borrowedBooks,
+      totalPages,
+    };
+  }
   public async returnBook(
     bookId: string,
     userId: string

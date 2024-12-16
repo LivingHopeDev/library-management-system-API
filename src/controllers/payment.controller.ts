@@ -4,7 +4,8 @@ import { PaymentService } from "../services";
 
 const paymentService = new PaymentService();
 export const payFine = asyncHandler(async (req: Request, res: Response) => {
-  const response = await paymentService.payFine(req.body);
+  const userId = req.user.id;
+  const response = await paymentService.payFine(req.body, userId);
   res.status(201).json({
     message: "Payment initialized successfully",
     data: response,
