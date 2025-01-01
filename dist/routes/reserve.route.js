@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.reserverRouter = void 0;
+const express_1 = require("express");
+const controllers_1 = require("../controllers");
+const middlewares_1 = require("../middlewares");
+const book_schema_1 = require("../schema/book.schema");
+const reserverRouter = (0, express_1.Router)();
+exports.reserverRouter = reserverRouter;
+reserverRouter.post("/", (0, middlewares_1.validateData)(book_schema_1.ReservedBookSchema), middlewares_1.authMiddleware, controllers_1.reserveBook);
+reserverRouter.delete("/:id/cancel", middlewares_1.authMiddleware, controllers_1.cancelReservedBook);
