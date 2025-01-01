@@ -112,6 +112,8 @@ model BorrowedBook {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
+
+  @@index([bookId])
   @@map("borrowed_books")
 }
 
@@ -125,6 +127,7 @@ model ReservedBook {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  @@index([bookId])
   @@map("reserved_books")
 }
 
@@ -139,5 +142,7 @@ model Fine {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+
+  @@index([bookId])
   @@map("fines")
 }
