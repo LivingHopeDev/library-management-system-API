@@ -7,6 +7,9 @@ import { errorHandler, routeNotFound } from "./middlewares";
 import log from "./utils/logger";
 import ServerAdapter from "./config/bullBoard";
 import { Request, Response } from "express";
+import { serve, setup } from "swagger-ui-express";
+import swaggerSpec from "./config/swaggerConfig";
+
 const app = express();
 const port = config.PORT;
 app.use(express.json());
@@ -19,6 +22,8 @@ app.get("/api", (req, res) => {
       "Welcome to library management system: I will be responding to your requests",
   });
 });
+
+app.use("/api/docs", serve, setup(swaggerSpec));
 app.get("/api/queues/:passkey", (req: Request, res: Response) => {
   if (req.params.passkey !== process.env.BULL_PASSKEY) {
     res.status(401).json({ message: "Unauthorized" });

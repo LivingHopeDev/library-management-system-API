@@ -11,7 +11,12 @@ const userRouter = Router();
 
 userRouter.get("/", authMiddleware, adminMiddleware, getAllUsers);
 userRouter.patch("/profile", authMiddleware, updateProfile); // for users
-userRouter.patch("/:id", authMiddleware, adminMiddleware, updateUserProfile); // for admin
+userRouter.patch(
+  "/:id/profile",
+  authMiddleware,
+  adminMiddleware,
+  updateUserProfile
+); // for admin
 
 userRouter.delete("/:id", authMiddleware, adminMiddleware, deleteUser);
 export { userRouter };

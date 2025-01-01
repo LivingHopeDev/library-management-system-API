@@ -5,7 +5,7 @@ import { FineService } from "../services";
 const fineService = new FineService();
 export const retrieveFines = asyncHandler(
   async (req: Request, res: Response) => {
-    const userId = req.user;
+    const userId = req.user.id;
     const { page, limit } = req.query;
     const { message, fines, totalPages } = await fineService.retrieveFines(
       userId,

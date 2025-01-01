@@ -18,12 +18,12 @@ const authRouter: Router = Router();
 
 authRouter.post("/register", validateData(SignUpSchema), signUp);
 authRouter.post("/login", validateData(loginSchema), login);
-authRouter.post("/password/reset", resetPassword);
 authRouter.post(
-  "/password/email-request",
+  "/password/reset",
   validateData(resetPasswordSchema),
-  forgetPassword
+  resetPassword
 );
+authRouter.post("/password/email-request", forgetPassword);
 authRouter.post("/verify-otp", validateData(otpSchema), verifyOtp);
 authRouter.post("/logout", authMiddleware, logout);
 

@@ -12,5 +12,5 @@ reserverRouter.post(
   reserveBook
 );
 
-reserverRouter.delete("/:id", authMiddleware, cancelReservedBook);
+reserverRouter.delete("/:id/cancel", authMiddleware, cancelReservedBook);
 export { reserverRouter };

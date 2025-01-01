@@ -23,8 +23,8 @@ export class HistoryService {
       limit = 10,
       filterBy,
       filterValue,
-      sortBy = "borrowedAt",
-      sortOrder = "asc",
+      sortBy,
+      sortOrder,
     } = query;
     const filterConditions: Record<string, any> = { borrowedBy: userId };
     if (filterBy && filterValue) {

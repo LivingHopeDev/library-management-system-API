@@ -122,7 +122,7 @@ export class PaymentService {
     toCurrency: string
   ): Promise<number> {
     const API_KEY = config.EXCHANGE_RATE_API_KEY;
-    const apiUrl = `https://v6.exchangerate-api.com/v6/b0dfe00cf0018c8fefa043e3/latest/USD`;
+    const apiUrl = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`;
 
     try {
       const response = await axios.get(apiUrl);
@@ -224,7 +224,7 @@ export class PaymentService {
         reject(error);
       });
 
-      reqPaystack.end(); // Complete the request
+      reqPaystack.end();
     });
   }
 
