@@ -186,4 +186,37 @@ export class AuthService {
       message: "Password reset successfully.",
     };
   };
+
+  public async resendOtp(email: string): Promise<{ message: string }> {
+    const user = await prismaClient.user.findFirst({
+      where: { email: email },
+    });
+    if (!user) {
+      throw new ResourceNotFound("User not found");
+    }
+
+    const token = generateNumericOTP(6);
+    const otp_expires = new Date(Date.now() + 15 * 60 * 1000);
+
+    const otp = await prismaClient.otp.create({
+      data: {
+        token: token,
+        expiry: otp_expires,
+        userId: user.id,
+      },
+    });
+    const { emailBody, emailText } =
+      await this.emailService.resetPasswordTemplate(user.username, otp!.token);
+
+    await addEmailToQueue({
+      from: config.GOOGLE_SENDER_MAIL,
+      to: email,
+      subject: "Email Verification",
+      text: emailText,
+      html: emailBody,
+    });
+    return {
+      message: "OTP sent successfully",
+    };
+  }
 }

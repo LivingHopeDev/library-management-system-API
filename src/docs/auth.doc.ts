@@ -156,80 +156,80 @@ export const verifyOtp = `
  *         description: Server error
  */
 `;
-// export const resendOtp = `
-// /**
-//  * @swagger
-//  * /api/v1/auth/resend-otp:
-//  *   post:
-//  *     summary: Resend OTP for Email Verification
-//  *     tags: [Authentication]
-//  *     requestBody:
-//  *       required: true
-//  *       content:
-//  *         application/json:
-//  *           schema:
-//  *             type: object
-//  *             properties:
-//  *               email:
-//  *                 type: string
-//  *                 example: user@example.com
-//  *
-//  *     responses:
-//  *       200:
-//  *         description: OTP successfully sent to the email address
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               type: object
-//  *               properties:
-//  *                 status_code:
-//  *                   type: number
-//  *                   example: 200
-//  *                 message:
-//  *                   type: string
-//  *                   example: OTP sent successfully
-//  *       400:
-//  *         description: Bad Request - Missing or invalid data
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               type: object
-//  *               properties:
-//  *                 error:
-//  *                   type: string
-//  *                   example: Bad Request
-//  *       404:
-//  *         description: User not found or email already verified
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               type: object
-//  *               properties:
-//  *                 error:
-//  *                   type: string
-//  *                   example: User not found
-//  *       422:
-//  *         description: Validation Error - Invalid email format or other errors
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               type: object
-//  *               properties:
-//  *                 error:
-//  *                   type: string
-//  *                   example: Invalid email format
-//  *       500:
-//  *         description: Internal Server Error
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               type: object
-//  *               properties:
-//  *                 error:
-//  *                   type: string
-//  *                   example: Internal Server Error
-//  */
-// `;
+export const resendOtp = `
+/**
+ * @swagger
+ * /api/v1/auth/resend-otp:
+ *   post:
+ *     summary: Resend OTP for Email Verification
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *
+ *     responses:
+ *       200:
+ *         description: OTP successfully sent to the email address
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status_code:
+ *                   type: number
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: OTP sent successfully
+ *       400:
+ *         description: Bad Request - Missing or invalid data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Bad Request
+ *       404:
+ *         description: User not found or email already verified
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: User not found
+ *       422:
+ *         description: Validation Error - Invalid email format or other errors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid email format
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal Server Error
+ */
+`;
 
 export const forgetPassword = `
 /**

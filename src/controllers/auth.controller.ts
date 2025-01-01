@@ -46,7 +46,13 @@ export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
     message,
   });
 });
+export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body;
 
+  const { message } = await authService.resendOtp(email);
+
+  return res.status(200).json({ status_code: 200, message });
+});
 export const logout = asyncHandler(async (req: Request, res: Response) => {
   const token = req.headers.authorization.split(" ")[1];
   const userId = req.user.id;

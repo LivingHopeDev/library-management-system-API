@@ -17,3 +17,6 @@ export const resetPasswordSchema = z.object({
   new_password: z.string().min(6),
   confirm_password: z.string().min(6),
 });
+export const resendOtpSchema = z.object({
+  email: z.string().email(),
+});

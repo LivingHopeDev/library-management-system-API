@@ -5,11 +5,13 @@ import {
   SignUpSchema,
   otpSchema,
   resetPasswordSchema,
+  resendOtpSchema,
 } from "../schema/user.schema";
 import {
   forgetPassword,
   login,
   logout,
+  resendOtp,
   resetPassword,
   signUp,
   verifyOtp,
@@ -23,8 +25,14 @@ authRouter.post(
   validateData(resetPasswordSchema),
   resetPassword
 );
-authRouter.post("/password/email-request", forgetPassword);
+authRouter.post(
+  "/password/email-request",
+  validateData(resendOtpSchema),
+  forgetPassword
+);
 authRouter.post("/verify-otp", validateData(otpSchema), verifyOtp);
+authRouter.post("/resend-otp", validateData(resendOtpSchema), resendOtp);
+
 authRouter.post("/logout", authMiddleware, logout);
 
 export { authRouter };
